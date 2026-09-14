@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RUNDOWN — O Dia do Analista Sênior</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #0F1115;
+    --panel: #171A21;
+    --panel-2: #1D212A;
+    --line: #2A2E38;
+    --amber: #FF9F1C;
+    --cyan: #4FD1C5;
+    --text: #E8E6E1;
+    --muted: #8B8D98;
+    --red: #FF5C5C;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+
+  /* ===== ON AIR HEADER ===== */
+  .onair-bar{
+    position: sticky; top:0; z-index: 50;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 24px;
+    display:flex; align-items:center; justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .onair-left{ display:flex; align-items:center; gap:10px; }
+  .onair-dot{
+    width:10px; height:10px; border-radius:50%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.35} }
+  .onair-label{
+    font-family: var(--mono); font-size: 12px; letter-spacing: 2px;
+    color: var(--red); font-weight:600;
+  }
+  .onair-title{
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+  }
+  #progressText{ color: var(--amber); font-weight:600; }
+
+  .rail{
+    height: 3px; background: var(--line);
+    position: relative; overflow:hidden;
+  }
+  .rail-fill{
+    position:absolute; top:0; left:0; height:100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--amber));
+    transition: width .2s ease;
+  }
+
+  /* ===== HERO ===== */
+  .hero{
+    padding: 72px 24px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-eyebrow{
+    font-family: var(--mono); font-size: 12px; letter-spacing: 3px;
+    color: var(--cyan); margin-bottom: 18px; text-transform: uppercase;
+  }
+  .hero h1{
+    font-family: var(--mono);
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+  .hero h1 span{ color: var(--amber); }
+  .hero p{
+    color: var(--muted); font-size: 16px; max-width: 640px; margin-bottom: 28px;
+  }
+  .hero-meta{
+    display:flex; gap: 28px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 13px;
+  }
+  .hero-meta div{ color: var(--muted); }
+  .hero-meta strong{ color: var(--text); display:block; font-size: 20px; }
+
+  /* ===== SCHEMA PANEL ===== */
+  .schema{
+    max-width: 900px; margin: 40px auto; padding: 0 24px;
+  }
+  .schema-toggle{
+    background: var(--panel); border: 1px solid var(--line);
+    color: var(--text); font-family: var(--mono); font-size: 13px;
+    padding: 14px 18px; width:100%; text-align:left; cursor:pointer;
+    display:flex; justify-content: space-between; align-items:center;
+    border-radius: 4px;
+  }
+  .schema-toggle:hover{ border-color: var(--cyan); }
+  .schema-toggle span.chev{ color: var(--amber); transition: transform .2s ease; }
+  .schema-body{
+    display:none;
+    background: var(--panel-2); border: 1px solid var(--line); border-top:none;
+    padding: 20px; font-family: var(--mono); font-size: 12.5px;
+    color: var(--muted); border-radius: 0 0 4px 4px;
+    overflow-x:auto;
+  }
+  .schema-body.open{ display:block; }
+  .schema-toggle.open .chev{ transform: rotate(90deg); }
+  .schema-body table{ margin-bottom: 18px; }
+  .schema-body .tname{ color: var(--cyan); font-weight:600; margin-bottom:6px; }
+  .schema-body pre{ white-space: pre-wrap; line-height:1.7; }
+  .schema-body .col{ color: var(--text); }
+  .schema-body .type{ color: #7a8093; }
+
+  /* ===== RUNDOWN LIST ===== */
+  .rundown{
+    max-width: 900px; margin: 0 auto; padding: 8px 24px 100px;
+    position: relative;
+  }
+  .rundown::before{
+    content:'';
+    position:absolute; left: 24px; top:0; bottom:0; width:1px;
+    background: var(--line);
+  }
+  @media (max-width:640px){ .rundown::before{ left: 12px; } }
+
+  .case{
+    position: relative;
+    margin: 28px 0;
+    padding-left: 56px;
+  }
+  @media (max-width:640px){ .case{ padding-left: 36px; } }
+
+  .case-node{
+    position:absolute; left: 24px; top: 6px;
+    width: 11px; height: 11px; border-radius:50%;
+    background: var(--panel); border: 2px solid var(--muted);
+    transform: translateX(-50%);
+    transition: border-color .2s ease, background .2s ease;
+  }
+  @media (max-width:640px){ .case-node{ left:12px; } }
+  .case.done .case-node{ border-color: var(--cyan); background: var(--cyan); }
+
+  .case-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .case-head{
+    padding: 18px 20px;
+    display:flex; align-items:flex-start; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .case-tag{
+    font-family: var(--mono); font-size: 11px; color: var(--amber);
+    letter-spacing: 1.5px; margin-bottom: 6px; display:block;
+  }
+  .case-time{
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .case-title{
+    font-family: var(--mono); font-size: 17px; font-weight:600; color: var(--text);
+    margin-top: 4px;
+  }
+  .badges{ display:flex; gap:8px; align-items:center; }
+  .badge{
+    font-family: var(--mono); font-size: 10.5px; padding: 4px 9px;
+    border-radius: 3px; letter-spacing: .5px; white-space:nowrap;
+    border: 1px solid transparent;
+  }
+  .diff-1{ color:#6FCF97; border-color:#2b4a3a; background: rgba(111,207,151,.08); }
+  .diff-2{ color: var(--cyan); border-color:#264a48; background: rgba(79,209,197,.08); }
+  .diff-3{ color: var(--amber); border-color:#4a3a1e; background: rgba(255,159,28,.08); }
+  .diff-4{ color: var(--red); border-color:#4a2424; background: rgba(255,92,92,.08); }
+
+  .case-body{ padding: 0 20px 20px; }
+  .context{
+    background: var(--panel-2);
+    border-left: 3px solid var(--cyan);
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #C9C7C0;
+    border-radius: 3px;
+    margin-bottom: 14px;
+  }
+  .context .who{ color: var(--cyan); font-weight:600; font-family: var(--mono); font-size:12px; display:block; margin-bottom:4px; }
+
+  .ask{ font-size: 15px; margin-bottom: 14px; }
+  .ask b{ color: var(--amber); }
+
+  .tables-used{
+    font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .tables-used code{ color: var(--cyan); }
+
+  .console-wrap{ margin-bottom: 14px; }
+  .console-label{
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    letter-spacing: 1px; margin-bottom: 6px; display:flex; justify-content: space-between;
+  }
+  .console-label .clear-btn{
+    background:none; border:none; color: var(--muted); cursor:pointer;
+    font-family: var(--mono); font-size: 11px; text-decoration: underline;
+  }
+  .console-label .clear-btn:hover{ color: var(--red); }
+  textarea.console{
+    width: 100%; min-height: 110px; resize: vertical;
+    background: #0C0D11; border: 1px solid var(--line);
+    color: #D7E8E6; font-family: var(--mono); font-size: 13px;
+    padding: 12px 14px; border-radius: 4px; line-height: 1.6;
+    outline: none;
+  }
+  textarea.console:focus{ border-color: var(--cyan); }
+  textarea.console::placeholder{ color: #4a4e5a; }
+
+  .reveal-btn{
+    background: transparent; border: 1px solid var(--line);
+    color: var(--amber); font-family: var(--mono); font-size: 12.5px;
+    padding: 9px 16px; cursor: pointer; border-radius: 4px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .reveal-btn:hover{ border-color: var(--amber); }
+
+  .solution{
+    display:none; margin-top: 14px;
+  }
+  .solution.open{ display:block; }
+  .solution pre{
+    background: #0C0D11; border: 1px solid var(--line);
+    padding: 14px 16px; border-radius: 4px; overflow-x:auto;
+    font-family: var(--mono); font-size: 13px; color: #D7E8E6;
+    line-height: 1.6;
+  }
+  .solution .kw{ color: var(--amber); }
+  .why{
+    margin-top: 10px; font-size: 13.5px; color: var(--muted);
+    border-top: 1px dashed var(--line); padding-top: 10px;
+  }
+  .why b{ color: var(--text); }
+
+  .mark-done{
+    margin-top: 12px;
+    background:none; border:none; color: var(--muted);
+    font-family: var(--mono); font-size: 11.5px; cursor:pointer;
+    display:flex; align-items:center; gap:6px;
+  }
+  .mark-done .chk{
+    width:14px; height:14px; border:1px solid var(--muted); border-radius:3px;
+    display:inline-block;
+  }
+  .case.done .mark-done{ color: var(--cyan); }
+  .case.done .mark-done .chk{ background: var(--cyan); border-color: var(--cyan); }
+
+  footer{
+    text-align:center; padding: 40px 24px 60px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    border-top: 1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<div class="onair-bar">
+  <div class="onair-left">
+    <span class="onair-dot"></span>
+    <span class="onair-label">NO AR</span>
+    <span class="onair-title">RUNDOWN — SALA DE DADOS / MÍDIA</span>
+  </div>
+  <div id="progressText">0 / 15 segmentos concluídos</div>
+</div>
+<div class="rail"><div class="rail-fill" id="railFill"></div></div>
+
+<section class="hero">
+  <div class="hero-eyebrow">Simulação de turno completo</div>
+  <h1>Um dia na mesa do <span>analista sênior</span></h1>
+  <p>
+    15 segmentos, na ordem em que chegam num dia real numa operação de mídia:
+    pings de canal, pedido de diretoria em cima da hora, dashboard que não bate,
+    fechamento de fatura. Cada card é o problema como ele chega — sem SQL pronto,
+    sem contexto mastigado. Resolva, depois confira.
+  </p>
+  <div class="hero-meta">
+    <div><strong>15</strong>casos</div>
+    <div><strong>5</strong>tabelas simuladas</div>
+    <div><strong>09h–19h</strong>janela do turno</div>
+    <div><strong>SQL Server</strong>dialeto</div>
+  </div>
+</section>
+
+<div class="schema">
+  <button class="schema-toggle" id="schemaToggle">
+    <span>📋 Ver schema das tabelas (abrir antes de começar)</span>
+    <span class="chev">▶</span>
+  </button>
+  <div class="schema-body" id="schemaBody">
+    <div class="tname">clientes</div>
+    <pre><span class="col">cliente_id</span>       <span class="type">INT PK</span>
+<span class="col">nome</span>            <span class="type">VARCHAR(100)</span>
+<span class="col">segmento</span>        <span class="type">VARCHAR(50)</span>   -- Varejo, Financeiro, Auto, FMCG, Educação
+<span class="col">tier</span>            <span class="type">VARCHAR(20)</span>   -- Enterprise, Mid, SMB</pre>
+
+    <div class="tname">campanhas</div>
+    <pre><span class="col">campanha_id</span>     <span class="type">INT PK</span>
+<span class="col">cliente_id</span>      <span class="type">INT FK -> clientes</span>
+<span class="col">nome</span>            <span class="type">VARCHAR(150)</span>
+<span class="col">canal</span>           <span class="type">VARCHAR(30)</span>   -- Meta, Google, TikTok, Programática, YouTube
+<span class="col">objetivo</span>        <span class="type">VARCHAR(30)</span>   -- Awareness, Conversão, Tráfego
+<span class="col">data_inicio</span>     <span class="type">DATE</span>
+<span class="col">data_fim</span>        <span class="type">DATE</span>
+<span class="col">orcamento_total</span> <span class="type">DECIMAL(12,2)</span></pre>
+
+    <div class="tname">criativos</div>
+    <pre><span class="col">criativo_id</span>     <span class="type">INT PK</span>
+<span class="col">campanha_id</span>     <span class="type">INT FK -> campanhas</span>
+<span class="col">nome</span>            <span class="type">VARCHAR(100)</span>
+<span class="col">formato</span>         <span class="type">VARCHAR(30)</span>   -- Vídeo, Carrossel, Estático, Stories</pre>
+
+    <div class="tname">veiculacoes</div>
+    <pre><span class="col">veiculacao_id</span>   <span class="type">INT PK</span>
+<span class="col">criativo_id</span>     <span class="type">INT FK -> criativos</span>
+<span class="col">data</span>            <span class="type">DATE</span>
+<span class="col">impressoes</span>      <span class="type">INT</span>
+<span class="col">cliques</span>         <span class="type">INT</span>
+<span class="col">gasto</span>           <span class="type">DECIMAL(10,2)</span></pre>
+
+    <div class="tname">conversoes</div>
+    <pre><span class="col">conversao_id</span>    <span class="type">INT PK</span>
+<span class="col">veiculacao_id</span>   <span class="type">INT FK -> veiculacoes</span>
+<span class="col">data</span>            <span class="type">DATE</span>
+<span class="col">tipo</span>            <span class="type">VARCHAR(30)</span>   -- Lead, Venda, Cadastro
+<span class="col">valor</span>           <span class="type">DECIMAL(10,2)</span></pre>
+  </div>
+</div>
+
+<div class="rundown" id="rundown"></div>
+
+<footer>RUNDOWN · dados 100% simulados, uso livre para treino · sem conexão com banco real</footer>
+
+<script>
+const cases = [
+  {
+    time:"09h02", tag:"SEGMENTO 01", diff:1,
+    title:"O café ainda tá quente",
+    who:"Você, sozinho, antes do primeiro Slack",
+    context:"Antes de qualquer pedido chegar, você confere se ontem fechou sem erro grosseiro. Puxa as veiculações de ontem.",
+    ask:"Liste todas as veiculações de <b>ontem</b> com impressões maiores que zero, ordenadas da que mais gastou para a que menos gastou.",
+    tables:["veiculacoes"],
+    sql:`<span class="kw">SELECT</span> veiculacao_id, criativo_id, data, impressoes, cliques, gasto
+<span class="kw">FROM</span> veiculacoes
+<span class="kw">WHERE</span> data = CAST(GETDATE() - <span class="kw">1</span> <span class="kw">AS</span> DATE)
+  <span class="kw">AND</span> impressoes > <span class="kw">0</span>
+<span class="kw">ORDER BY</span> gasto <span class="kw">DESC</span>;`,
+    why:"Base do ofício: filtrar e ordenar. Parece bobo, mas é o primeiro filtro que separa quem lê a base rápido de quem trava em coisa simples sob pressão."
+  },
+  {
+    time:"09h20", tag:"SEGMENTO 02", diff:1,
+    title:"O cliente Enterprise que ninguém pode irritar",
+    who:"Gerente de contas, no privado",
+    context:"“Antes da call das 10h, me diz que campanhas do segmento Enterprise ainda estão ativas hoje.”",
+    ask:"Liste as campanhas cujo <b>cliente é tier Enterprise</b> e cuja <code>data_fim</code> ainda não passou.",
+    tables:["campanhas","clientes"],
+    sql:`<span class="kw">SELECT</span> c.campanha_id, c.nome, c.canal, c.data_fim
+<span class="kw">FROM</span> campanhas c
+<span class="kw">JOIN</span> clientes cl <span class="kw">ON</span> cl.cliente_id = c.cliente_id
+<span class="kw">WHERE</span> cl.tier = <span class="kw">'Enterprise'</span>
+  <span class="kw">AND</span> c.data_fim >= CAST(GETDATE() <span class="kw">AS</span> DATE)
+<span class="kw">ORDER BY</span> c.data_fim;`,
+    why:"Primeiro JOIN do dia: campanha não tem tier — tier mora em cliente. Saber onde cada atributo mora é metade do trabalho de escrever a query certa."
+  },
+  {
+    time:"09h47", tag:"SEGMENTO 03", diff:2,
+    title:"“Isso aqui parece caro”",
+    who:"Diretor de mídia, comentário solto no corredor",
+    context:"Ele quer saber o CPC (custo por clique) por campanha, sem entrar em nenhum detalhe de criativo.",
+    ask:"Para cada campanha, calcule o <b>CPC médio</b> (gasto total dividido por cliques totais), somando todas as veiculações de todos os criativos daquela campanha.",
+    tables:["campanhas","criativos","veiculacoes"],
+    sql:`<span class="kw">SELECT</span> camp.campanha_id, camp.nome,
+       SUM(v.gasto) <span class="kw">AS</span> gasto_total,
+       SUM(v.cliques) <span class="kw">AS</span> cliques_total,
+       CASE <span class="kw">WHEN</span> SUM(v.cliques) = <span class="kw">0</span> <span class="kw">THEN</span> <span class="kw">NULL</span>
+            <span class="kw">ELSE</span> SUM(v.gasto) / SUM(v.cliques) <span class="kw">END</span> <span class="kw">AS</span> cpc_medio
+<span class="kw">FROM</span> campanhas camp
+<span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+<span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+<span class="kw">GROUP BY</span> camp.campanha_id, camp.nome
+<span class="kw">ORDER BY</span> cpc_medio <span class="kw">DESC</span>;`,
+    why:"JOIN triplo + GROUP BY. Repare no CASE protegendo contra divisão por zero — em produção, cliques = 0 acontece e derruba dashboard se você não tratar."
+  },
+  {
+    time:"10h15", tag:"SEGMENTO 04", diff:2,
+    title:"O cliente que sumiu do relatório",
+    who:"Você, revisando antes de mandar",
+    context:"Um cliente reclamou que não aparece no relatório mensal. Você suspeita que é cliente sem nenhuma campanha cadastrada ainda.",
+    ask:"Liste <b>todos os clientes</b>, mesmo os que não têm nenhuma campanha, junto com a contagem de campanhas de cada um.",
+    tables:["clientes","campanhas"],
+    sql:`<span class="kw">SELECT</span> cl.cliente_id, cl.nome,
+       COUNT(camp.campanha_id) <span class="kw">AS</span> total_campanhas
+<span class="kw">FROM</span> clientes cl
+<span class="kw">LEFT JOIN</span> campanhas camp <span class="kw">ON</span> camp.cliente_id = cl.cliente_id
+<span class="kw">GROUP BY</span> cl.cliente_id, cl.nome
+<span class="kw">ORDER BY</span> total_campanhas;`,
+    why:"O clássico INNER x LEFT. INNER teria escondido exatamente o cliente que o time queria enxergar. Isso derruba mais relatório de BI do que qualquer outra coisa."
+  },
+  {
+    time:"10h40", tag:"SEGMENTO 05", diff:2,
+    title:"Auditoria de formato",
+    who:"Time de criação, pedido por e-mail",
+    context:"Querem saber quais formatos de criativo (Vídeo, Carrossel, etc) estão rodando em campanhas de <b>Awareness</b>.",
+    ask:"Liste os formatos distintos de criativo usados em campanhas com <code>objetivo = 'Awareness'</code>, com a contagem de criativos por formato.",
+    tables:["campanhas","criativos"],
+    sql:`<span class="kw">SELECT</span> cr.formato, COUNT(*) <span class="kw">AS</span> qtd_criativos
+<span class="kw">FROM</span> criativos cr
+<span class="kw">JOIN</span> campanhas camp <span class="kw">ON</span> camp.campanha_id = cr.campanha_id
+<span class="kw">WHERE</span> camp.objetivo = <span class="kw">'Awareness'</span>
+<span class="kw">GROUP BY</span> cr.formato
+<span class="kw">ORDER BY</span> qtd_criativos <span class="kw">DESC</span>;`,
+    why:"Filtro antes do agrupamento (WHERE) versus filtro depois (HAVING) — aqui o filtro é sobre uma coluna que já existe antes de agregar, então WHERE resolve. Ainda não precisa de HAVING."
+  },
+  {
+    time:"11h10", tag:"SEGMENTO 06", diff:2,
+    title:"Só os canais que estouraram o CTR",
+    who:"Head de performance",
+    context:"“Me manda só os canais com CTR médio acima de 1.5% esse mês. Não quero ver os que estão na média.”",
+    ask:"Calcule o CTR médio (cliques / impressões) por canal no mês atual e <b>filtre apenas os canais acima de 1.5%</b>.",
+    tables:["campanhas","criativos","veiculacoes"],
+    sql:`<span class="kw">SELECT</span> camp.canal,
+       SUM(v.cliques) * <span class="kw">1.0</span> / <span class="kw">NULLIF</span>(SUM(v.impressoes),<span class="kw">0</span>) <span class="kw">AS</span> ctr_medio
+<span class="kw">FROM</span> campanhas camp
+<span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+<span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+<span class="kw">WHERE</span> MONTH(v.data) = MONTH(GETDATE()) <span class="kw">AND</span> YEAR(v.data) = YEAR(GETDATE())
+<span class="kw">GROUP BY</span> camp.canal
+<span class="kw">HAVING</span> SUM(v.cliques) * <span class="kw">1.0</span> / <span class="kw">NULLIF</span>(SUM(v.impressoes),<span class="kw">0</span>) > <span class="kw">0.015</span>
+<span class="kw">ORDER BY</span> ctr_medio <span class="kw">DESC</span>;`,
+    why:"Aqui HAVING é obrigatório: o filtro é sobre o RESULTADO da agregação (CTR), não sobre uma coluna crua. WHERE não enxerga SUM(). Repare também no NULLIF evitando erro de divisão por zero."
+  },
+  {
+    time:"11h35", tag:"SEGMENTO 07", diff:3,
+    title:"A pergunta que a diretoria sempre faz",
+    who:"CEO, num print de tela mandado pelo WhatsApp",
+    context:"“Quais clientes estão gastando mais que a média geral de gasto por cliente?” — pergunta clássica de quem quer saber quem carrega a conta.",
+    ask:"Liste os clientes cujo gasto total (soma de todas as veiculações) está <b>acima da média de gasto entre todos os clientes</b>.",
+    tables:["clientes","campanhas","criativos","veiculacoes"],
+    sql:`<span class="kw">SELECT</span> cliente_id, nome, gasto_total
+<span class="kw">FROM</span> (
+    <span class="kw">SELECT</span> cl.cliente_id, cl.nome, SUM(v.gasto) <span class="kw">AS</span> gasto_total
+    <span class="kw">FROM</span> clientes cl
+    <span class="kw">JOIN</span> campanhas camp <span class="kw">ON</span> camp.cliente_id = cl.cliente_id
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+    <span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+    <span class="kw">GROUP BY</span> cl.cliente_id, cl.nome
+) <span class="kw">AS</span> gasto_por_cliente
+<span class="kw">WHERE</span> gasto_total > (
+    <span class="kw">SELECT</span> AVG(gasto_total) <span class="kw">FROM</span> (
+        <span class="kw">SELECT</span> cl2.cliente_id, SUM(v2.gasto) <span class="kw">AS</span> gasto_total
+        <span class="kw">FROM</span> clientes cl2
+        <span class="kw">JOIN</span> campanhas camp2 <span class="kw">ON</span> camp2.cliente_id = cl2.cliente_id
+        <span class="kw">JOIN</span> criativos cr2 <span class="kw">ON</span> cr2.campanha_id = camp2.campanha_id
+        <span class="kw">JOIN</span> veiculacoes v2 <span class="kw">ON</span> v2.criativo_id = cr2.criativo_id
+        <span class="kw">GROUP BY</span> cl2.cliente_id
+    ) <span class="kw">AS</span> base
+);`,
+    why:"Subquery clássica: você não pode comparar uma linha com uma média sem calcular a média separadamente primeiro. Note que a subquery de fora usa um resultado já agregado — é 'agregação da agregação'."
+  },
+  {
+    time:"12h05", tag:"SEGMENTO 08", diff:3,
+    title:"Almoço interrompido",
+    who:"Analista júnior, perdido numa planilha",
+    context:"Ele te manda print: “esse conjunto de campanhas aqui não bate com o que a agência mandou, dá uma olhada?” Ele quer saber quais campanhas <b>nunca converteram</b>.",
+    ask:"Liste as campanhas que tiveram veiculação (gasto > 0) mas que <b>nunca geraram nenhuma conversão</b>.",
+    tables:["campanhas","criativos","veiculacoes","conversoes"],
+    sql:`<span class="kw">SELECT DISTINCT</span> camp.campanha_id, camp.nome
+<span class="kw">FROM</span> campanhas camp
+<span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+<span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+<span class="kw">WHERE</span> v.gasto > <span class="kw">0</span>
+  <span class="kw">AND NOT EXISTS</span> (
+      <span class="kw">SELECT</span> <span class="kw">1</span> <span class="kw">FROM</span> conversoes conv
+      <span class="kw">WHERE</span> conv.veiculacao_id = v.veiculacao_id
+  );`,
+    why:"NOT EXISTS é geralmente melhor que NOT IN quando pode haver NULL do lado de dentro, e costuma performar melhor que LEFT JOIN + IS NULL em bases grandes. As três formas resolvem — vale saber as três."
+  },
+  {
+    time:"13h30", tag:"SEGMENTO 09", diff:3,
+    title:"O ranking que vira bônus",
+    who:"RH, pedido anual (mas sempre cai na sua mesa em cima da hora)",
+    context:"“Preciso do top 3 criativo por gasto, dentro de cada campanha” — vai virar critério de bônus da equipe de criação.",
+    ask:"Para cada campanha, mostre os <b>3 criativos que mais gastaram</b>, com a posição no ranking.",
+    tables:["campanhas","criativos","veiculacoes"],
+    sql:`<span class="kw">WITH</span> gasto_criativo <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> camp.campanha_id, cr.criativo_id, cr.nome,
+           SUM(v.gasto) <span class="kw">AS</span> gasto_total,
+           ROW_NUMBER() OVER (
+               PARTITION <span class="kw">BY</span> camp.campanha_id
+               <span class="kw">ORDER BY</span> SUM(v.gasto) <span class="kw">DESC</span>
+           ) <span class="kw">AS</span> posicao
+    <span class="kw">FROM</span> campanhas camp
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+    <span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+    <span class="kw">GROUP BY</span> camp.campanha_id, cr.criativo_id, cr.nome
+)
+<span class="kw">SELECT</span> campanha_id, criativo_id, nome, gasto_total, posicao
+<span class="kw">FROM</span> gasto_criativo
+<span class="kw">WHERE</span> posicao <= <span class="kw">3</span>
+<span class="kw">ORDER BY</span> campanha_id, posicao;`,
+    why:"Primeira window function do dia. ROW_NUMBER() com PARTITION BY é o 'GROUP BY que não esconde a linha' — você mantém o detalhe do criativo E ganha o ranking dentro do grupo. HAVING não faria isso sozinho."
+  },
+  {
+    time:"14h00", tag:"SEGMENTO 10", diff:3,
+    title:"“Isso subiu ou caiu?”",
+    who:"Gerente de contas, olhando o gráfico ao vivo com você na tela",
+    context:"Ele quer ver a evolução dia a dia do gasto de uma campanha específica, comparado com o dia anterior — sem abrir Excel.",
+    ask:"Para a campanha 101, mostre o gasto diário e, ao lado, o <b>gasto do dia anterior</b> na mesma linha (para calcular variação depois).",
+    tables:["veiculacoes","criativos"],
+    sql:`<span class="kw">SELECT</span> v.data,
+       SUM(v.gasto) <span class="kw">AS</span> gasto_dia,
+       LAG(SUM(v.gasto)) OVER (<span class="kw">ORDER BY</span> v.data) <span class="kw">AS</span> gasto_dia_anterior
+<span class="kw">FROM</span> veiculacoes v
+<span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.criativo_id = v.criativo_id
+<span class="kw">WHERE</span> cr.campanha_id = <span class="kw">101</span>
+<span class="kw">GROUP BY</span> v.data
+<span class="kw">ORDER BY</span> v.data;`,
+    why:"LAG() é a função que resolve 'comparar linha com a linha anterior' sem self-join. Repare que ela roda sobre o resultado já agregado (SUM), não sobre a linha crua — window function depois de GROUP BY é permitido em SQL Server."
+  },
+  {
+    time:"14h35", tag:"SEGMENTO 11", diff:4,
+    title:"A sequência de dias sem gasto",
+    who:"Auditoria interna, pedido chato de sexta-feira",
+    context:"Eles suspeitam que uma campanha ficou pausada por engano. Querem saber os <b>períodos contínuos de dias sem nenhum gasto</b> registrado, dentro do intervalo ativo da campanha.",
+    ask:"Para a campanha 205, identifique os blocos de <b>dias consecutivos com gasto diário igual a zero</b> (ou sem registro), mostrando data de início e fim de cada bloco.",
+    tables:["veiculacoes","criativos"],
+    sql:`<span class="kw">WITH</span> calendario <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> DATEADD(DAY, n, <span class="kw">'2026-01-01'</span>) <span class="kw">AS</span> data
+    <span class="kw">FROM</span> (<span class="kw">SELECT TOP</span> (<span class="kw">200</span>) ROW_NUMBER() OVER (<span class="kw">ORDER BY</span> (<span class="kw">SELECT NULL</span>)) - <span class="kw">1 AS</span> n
+          <span class="kw">FROM</span> sys.all_objects) <span class="kw">AS</span> nums
+),
+gasto_dia <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> cal.data,
+           <span class="kw">COALESCE</span>(SUM(v.gasto), <span class="kw">0</span>) <span class="kw">AS</span> gasto
+    <span class="kw">FROM</span> calendario cal
+    <span class="kw">LEFT JOIN</span> veiculacoes v
+        <span class="kw">ON</span> v.data = cal.data
+        <span class="kw">AND</span> v.criativo_id <span class="kw">IN</span> (<span class="kw">SELECT</span> criativo_id <span class="kw">FROM</span> criativos <span class="kw">WHERE</span> campanha_id = <span class="kw">205</span>)
+    <span class="kw">GROUP BY</span> cal.data
+),
+marcado <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> data, gasto,
+           <span class="kw">CASE WHEN</span> gasto = <span class="kw">0 THEN 1 ELSE 0 END AS</span> zerado,
+           ROW_NUMBER() OVER (<span class="kw">ORDER BY</span> data) -
+           ROW_NUMBER() OVER (PARTITION <span class="kw">BY CASE WHEN</span> gasto = <span class="kw">0 THEN 1 ELSE 0 END ORDER BY</span> data) <span class="kw">AS</span> grupo
+    <span class="kw">FROM</span> gasto_dia
+)
+<span class="kw">SELECT MIN</span>(data) <span class="kw">AS</span> inicio_bloco, <span class="kw">MAX</span>(data) <span class="kw">AS</span> fim_bloco, <span class="kw">COUNT</span>(*) <span class="kw">AS</span> dias_zerados
+<span class="kw">FROM</span> marcado
+<span class="kw">WHERE</span> zerado = <span class="kw">1</span>
+<span class="kw">GROUP BY</span> grupo
+<span class="kw">ORDER BY</span> inicio_bloco;`,
+    why:"Clássico 'gaps and islands'. A sacada: a diferença entre dois ROW_NUMBER() (um geral, um particionado pela flag) fica constante enquanto a sequência não quebra — isso vira a 'ilha' que você agrupa. É o tipo de query que separa pleno de sênior."
+  },
+  {
+    time:"15h10", tag:"SEGMENTO 12", diff:3,
+    title:"A carta do CFO",
+    who:"Financeiro, e-mail formal com cópia para seu gestor",
+    context:"Fechamento do mês: eles precisam do ROAS (retorno sobre gasto) por cliente, mas só dos clientes que <b>gastaram mais que R$ 5.000</b> no mês — abaixo disso, é irrelevante pro relatório.",
+    ask:"Calcule o ROAS (valor de conversão / gasto) por cliente no mês atual, considerando apenas clientes com <b>gasto total acima de R$ 5.000</b>.",
+    tables:["clientes","campanhas","criativos","veiculacoes","conversoes"],
+    sql:`<span class="kw">WITH</span> base <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> cl.cliente_id, cl.nome,
+           SUM(v.gasto) <span class="kw">AS</span> gasto_total,
+           <span class="kw">COALESCE</span>(SUM(conv.valor), <span class="kw">0</span>) <span class="kw">AS</span> receita_total
+    <span class="kw">FROM</span> clientes cl
+    <span class="kw">JOIN</span> campanhas camp <span class="kw">ON</span> camp.cliente_id = cl.cliente_id
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+    <span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+    <span class="kw">LEFT JOIN</span> conversoes conv <span class="kw">ON</span> conv.veiculacao_id = v.veiculacao_id
+    <span class="kw">WHERE</span> MONTH(v.data) = MONTH(GETDATE()) <span class="kw">AND</span> YEAR(v.data) = YEAR(GETDATE())
+    <span class="kw">GROUP BY</span> cl.cliente_id, cl.nome
+)
+<span class="kw">SELECT</span> cliente_id, nome, gasto_total, receita_total,
+       receita_total / <span class="kw">NULLIF</span>(gasto_total,<span class="kw">0</span>) <span class="kw">AS</span> roas
+<span class="kw">FROM</span> base
+<span class="kw">WHERE</span> gasto_total > <span class="kw">5000</span>
+<span class="kw">ORDER BY</span> roas <span class="kw">DESC</span>;`,
+    why:"CTE deixa o código legível em duas etapas: primeiro monta a base agregada com nome de negócio (gasto_total, receita_total), depois filtra e calcula em cima dela. Sem CTE isso vira subquery aninhada ilegível ou repetição de JOIN."
+  },
+  {
+    time:"16h00", tag:"SEGMENTO 13", diff:4,
+    title:"A campanha zumbi",
+    who:"Você mesmo, revisando saúde da conta antes do fechamento",
+    context:"Precisa achar campanhas que pareciam saudáveis mas <b>o CTR caiu mais de 30% na segunda metade do período</b> em relação à primeira metade — sinal de fadiga de criativo que ninguém percebeu.",
+    ask:"Para cada campanha, compare o CTR médio da primeira metade do período de veiculação com o da segunda metade e liste as que <b>caíram mais de 30%</b>.",
+    tables:["campanhas","criativos","veiculacoes"],
+    sql:`<span class="kw">WITH</span> periodo <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> camp.campanha_id, camp.data_inicio, camp.data_fim,
+           DATEADD(DAY, DATEDIFF(DAY, camp.data_inicio, camp.data_fim) / <span class="kw">2</span>, camp.data_inicio) <span class="kw">AS</span> meio
+    <span class="kw">FROM</span> campanhas camp
+),
+metricas <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> p.campanha_id,
+        SUM(<span class="kw">CASE WHEN</span> v.data <= p.meio <span class="kw">THEN</span> v.cliques <span class="kw">ELSE 0 END</span>) * <span class="kw">1.0</span> /
+            <span class="kw">NULLIF</span>(SUM(<span class="kw">CASE WHEN</span> v.data <= p.meio <span class="kw">THEN</span> v.impressoes <span class="kw">ELSE 0 END</span>),<span class="kw">0</span>) <span class="kw">AS</span> ctr_primeira_metade,
+        SUM(<span class="kw">CASE WHEN</span> v.data > p.meio <span class="kw">THEN</span> v.cliques <span class="kw">ELSE 0 END</span>) * <span class="kw">1.0</span> /
+            <span class="kw">NULLIF</span>(SUM(<span class="kw">CASE WHEN</span> v.data > p.meio <span class="kw">THEN</span> v.impressoes <span class="kw">ELSE 0 END</span>),<span class="kw">0</span>) <span class="kw">AS</span> ctr_segunda_metade
+    <span class="kw">FROM</span> periodo p
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = p.campanha_id
+    <span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+    <span class="kw">GROUP BY</span> p.campanha_id
+)
+<span class="kw">SELECT</span> campanha_id, ctr_primeira_metade, ctr_segunda_metade,
+       (ctr_segunda_metade - ctr_primeira_metade) / <span class="kw">NULLIF</span>(ctr_primeira_metade,<span class="kw">0</span>) <span class="kw">AS</span> variacao
+<span class="kw">FROM</span> metricas
+<span class="kw">WHERE</span> ctr_primeira_metade > <span class="kw">0</span>
+  <span class="kw">AND</span> (ctr_segunda_metade - ctr_primeira_metade) / ctr_primeira_metade < <span class="kw">-0.30</span>;`,
+    why:"CASE WHEN dentro de agregação é o truque para 'pivotar' duas janelas de tempo numa linha só, sem precisar de duas queries e um JOIN manual entre elas. É pattern que aparece toda vez que alguém pede 'compare período A com período B'."
+  },
+  {
+    time:"16h50", tag:"SEGMENTO 14", diff:4,
+    title:"O funil que não fecha",
+    who:"Head de growth, no fim do dia, sem paciência para relatório longo",
+    context:"“Me dá o funil: quantas veiculações geraram pelo menos 1 clique, quantas geraram pelo menos 1 conversão, e a taxa de cada etapa — por canal.”",
+    ask:"Monte um funil por canal: total de veiculações, veiculações com pelo menos 1 clique, veiculações com pelo menos 1 conversão, e as <b>taxas de conversão de cada etapa</b>.",
+    tables:["campanhas","criativos","veiculacoes","conversoes"],
+    sql:`<span class="kw">WITH</span> funil <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> camp.canal,
+           v.veiculacao_id,
+           <span class="kw">CASE WHEN</span> v.cliques > <span class="kw">0 THEN 1 ELSE 0 END AS</span> teve_clique,
+           <span class="kw">CASE WHEN EXISTS</span> (
+               <span class="kw">SELECT 1 FROM</span> conversoes conv <span class="kw">WHERE</span> conv.veiculacao_id = v.veiculacao_id
+           ) <span class="kw">THEN 1 ELSE 0 END AS</span> teve_conversao
+    <span class="kw">FROM</span> veiculacoes v
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.criativo_id = v.criativo_id
+    <span class="kw">JOIN</span> campanhas camp <span class="kw">ON</span> camp.campanha_id = cr.campanha_id
+)
+<span class="kw">SELECT</span> canal,
+       COUNT(*) <span class="kw">AS</span> total_veiculacoes,
+       SUM(teve_clique) <span class="kw">AS</span> com_clique,
+       SUM(teve_conversao) <span class="kw">AS</span> com_conversao,
+       SUM(teve_clique) * <span class="kw">1.0</span> / <span class="kw">NULLIF</span>(COUNT(*),<span class="kw">0</span>) <span class="kw">AS</span> taxa_clique,
+       SUM(teve_conversao) * <span class="kw">1.0</span> / <span class="kw">NULLIF</span>(SUM(teve_clique),<span class="kw">0</span>) <span class="kw">AS</span> taxa_conversao_sobre_clique
+<span class="kw">FROM</span> funil
+<span class="kw">GROUP BY</span> canal
+<span class="kw">ORDER BY</span> taxa_conversao_sobre_clique <span class="kw">DESC</span>;`,
+    why:"Funil é sempre a mesma receita: marcar cada linha com flags 0/1 numa CTE, depois somar as flags lá fora. Isso é mais robusto que três queries separadas com COUNT DISTINCT, porque garante que a base de cada etapa é exatamente a mesma."
+  },
+  {
+    time:"18h20", tag:"SEGMENTO 15", diff:4,
+    title:"O apagar das luzes",
+    who:"Seu gestor, ligação rápida antes de todo mundo sair",
+    context:"“Antes de fechar o dia: me dá o top 1 criativo de cada cliente, só considerando clientes que tiveram queda de gasto mês contra mês. Isso vai pra reunião de amanhã cedo.”",
+    ask:"Identifique os clientes cujo gasto do mês atual é <b>menor</b> que o do mês anterior e, para cada um, traga o criativo de <b>maior gasto</b> no mês atual.",
+    tables:["clientes","campanhas","criativos","veiculacoes"],
+    sql:`<span class="kw">WITH</span> gasto_mensal <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> cl.cliente_id,
+           SUM(<span class="kw">CASE WHEN</span> MONTH(v.data)=MONTH(GETDATE()) <span class="kw">AND</span> YEAR(v.data)=YEAR(GETDATE())
+                <span class="kw">THEN</span> v.gasto <span class="kw">ELSE 0 END</span>) <span class="kw">AS</span> gasto_mes_atual,
+           SUM(<span class="kw">CASE WHEN</span> MONTH(v.data)=MONTH(DATEADD(MONTH,-<span class="kw">1</span>,GETDATE())) <span class="kw">AND</span> YEAR(v.data)=YEAR(DATEADD(MONTH,-<span class="kw">1</span>,GETDATE()))
+                <span class="kw">THEN</span> v.gasto <span class="kw">ELSE 0 END</span>) <span class="kw">AS</span> gasto_mes_anterior
+    <span class="kw">FROM</span> clientes cl
+    <span class="kw">JOIN</span> campanhas camp <span class="kw">ON</span> camp.cliente_id = cl.cliente_id
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+    <span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+    <span class="kw">GROUP BY</span> cl.cliente_id
+),
+clientes_em_queda <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> cliente_id <span class="kw">FROM</span> gasto_mensal
+    <span class="kw">WHERE</span> gasto_mes_atual < gasto_mes_anterior
+),
+criativo_top <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> cl.cliente_id, cr.criativo_id, cr.nome, SUM(v.gasto) <span class="kw">AS</span> gasto_criativo,
+           ROW_NUMBER() OVER (PARTITION <span class="kw">BY</span> cl.cliente_id <span class="kw">ORDER BY</span> SUM(v.gasto) <span class="kw">DESC</span>) <span class="kw">AS</span> rn
+    <span class="kw">FROM</span> clientes cl
+    <span class="kw">JOIN</span> campanhas camp <span class="kw">ON</span> camp.cliente_id = cl.cliente_id
+    <span class="kw">JOIN</span> criativos cr <span class="kw">ON</span> cr.campanha_id = camp.campanha_id
+    <span class="kw">JOIN</span> veiculacoes v <span class="kw">ON</span> v.criativo_id = cr.criativo_id
+    <span class="kw">WHERE</span> cl.cliente_id <span class="kw">IN</span> (<span class="kw">SELECT</span> cliente_id <span class="kw">FROM</span> clientes_em_queda)
+      <span class="kw">AND</span> MONTH(v.data) = MONTH(GETDATE()) <span class="kw">AND</span> YEAR(v.data) = YEAR(GETDATE())
+    <span class="kw">GROUP BY</span> cl.cliente_id, cr.criativo_id, cr.nome
+)
+<span class="kw">SELECT</span> cliente_id, criativo_id, nome, gasto_criativo
+<span class="kw">FROM</span> criativo_top
+<span class="kw">WHERE</span> rn = <span class="kw">1</span>
+<span class="kw">ORDER BY</span> gasto_criativo <span class="kw">DESC</span>;`,
+    why:"O fechamento junta tudo do dia: múltiplas CTEs encadeadas, cada uma resolvendo um pedaço do problema de negócio, e a última usando ROW_NUMBER() para pegar 'o top 1 de cada grupo'. Se você chegou até aqui sozinho, você não está mais aprendendo SQL — está fazendo o trabalho."
+  },
+];
+
+const diffLabel = ["", "BÁSICO", "INTERMEDIÁRIO", "AVANÇADO", "SÊNIOR"];
+
+function render(){
+  const container = document.getElementById('rundown');
+  container.innerHTML = cases.map((c, i) => `
+    <div class="case" id="case-${i}" data-idx="${i}">
+      <div class="case-node"></div>
+      <div class="case-card">
+        <div class="case-head">
+          <div>
+            <span class="case-tag">${c.tag}</span>
+            <div class="case-title">${c.title}</div>
+            <div class="case-time">⏱ ${c.time}</div>
+          </div>
+          <div class="badges">
+            <span class="badge diff-${c.diff}">${diffLabel[c.diff]}</span>
+          </div>
+        </div>
+        <div class="case-body">
+          <div class="context"><span class="who">${c.who}</span>${c.context}</div>
+          <div class="ask">${c.ask}</div>
+          <div class="tables-used">Tabelas envolvidas: ${c.tables.map(t=>`<code>${t}</code>`).join(', ')}</div>
+          <div class="console-wrap">
+            <div class="console-label">
+              <span>&gt; SUA QUERY</span>
+              <button class="clear-btn" data-idx="${i}">limpar</button>
+            </div>
+            <textarea class="console" id="console-${i}" data-idx="${i}" spellcheck="false" placeholder="SELECT ..."></textarea>
+          </div>
+          <button class="reveal-btn" data-idx="${i}">▶ Ver resolução</button>
+          <div class="solution" id="sol-${i}">
+            <pre>${c.sql}</pre>
+            <div class="why"><b>Por que importa:</b> ${c.why}</div>
+          </div>
+          <button class="mark-done" data-idx="${i}"><span class="chk"></span> marcar como resolvido</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.reveal-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = btn.dataset.idx;
+      const sol = document.getElementById('sol-'+idx);
+      sol.classList.toggle('open');
+      btn.textContent = sol.classList.contains('open') ? '▼ Ocultar resolução' : '▶ Ver resolução';
+    });
+  });
+
+  document.querySelectorAll('.clear-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = btn.dataset.idx;
+      document.getElementById('console-'+idx).value = '';
+    });
+  });
+
+  document.querySelectorAll('.mark-done').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = btn.dataset.idx;
+      const caseEl = document.getElementById('case-'+idx);
+      caseEl.classList.toggle('done');
+      updateProgress();
+    });
+  });
+}
+
+function updateProgress(){
+  const total = cases.length;
+  const done = document.querySelectorAll('.case.done').length;
+  document.getElementById('progressText').textContent = `${done} / ${total} segmentos concluídos`;
+  document.getElementById('railFill').style.width = (done/total*100)+'%';
+}
+
+document.getElementById('schemaToggle').addEventListener('click', ()=>{
+  const body = document.getElementById('schemaBody');
+  const btn = document.getElementById('schemaToggle');
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+});
+
+render();
+</script>
+</body>
+</html>
