@@ -17,6 +17,7 @@
     --text: #E8E6E1;
     --muted: #8B8D98;
     --red: #FF5C5C;
+    --green: #6FCF97;
     --mono: 'IBM Plex Mono', monospace;
     --sans: 'IBM Plex Sans', sans-serif;
   }
@@ -34,7 +35,6 @@
     *{ animation: none !important; transition: none !important; }
   }
 
-  /* ===== ON AIR HEADER ===== */
   .onair-bar{
     position: sticky; top:0; z-index: 50;
     background: var(--panel);
@@ -72,7 +72,6 @@
     transition: width .2s ease;
   }
 
-  /* ===== HERO ===== */
   .hero{
     padding: 72px 24px 48px;
     max-width: 900px;
@@ -102,7 +101,6 @@
   .hero-meta div{ color: var(--muted); }
   .hero-meta strong{ color: var(--text); display:block; font-size: 20px; }
 
-  /* ===== SCHEMA PANEL ===== */
   .schema{
     max-width: 900px; margin: 40px auto; padding: 0 24px;
   }
@@ -130,7 +128,6 @@
   .schema-body .col{ color: var(--text); }
   .schema-body .type{ color: #7a8093; }
 
-  /* ===== RUNDOWN LIST ===== */
   .rundown{
     max-width: 900px; margin: 0 auto; padding: 8px 24px 100px;
     position: relative;
@@ -164,7 +161,11 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     overflow: hidden;
+    transition: border-color .2s ease, box-shadow .2s ease;
   }
+  .case-card.correct{ border-color:#2b4a3a; box-shadow: 0 0 0 1px rgba(111,207,151,.18); }
+  .case-card.wrong{ border-color:#4a2424; box-shadow: 0 0 0 1px rgba(255,92,92,.15); }
+
   .case-head{
     padding: 18px 20px;
     display:flex; align-items:flex-start; justify-content: space-between;
@@ -233,6 +234,8 @@
   textarea.console:focus{ border-color: var(--cyan); }
   textarea.console::placeholder{ color: #4a4e5a; }
 
+  .case-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
   .reveal-btn{
     background: transparent; border: 1px solid var(--line);
     color: var(--amber); font-family: var(--mono); font-size: 12.5px;
@@ -241,9 +244,94 @@
   }
   .reveal-btn:hover{ border-color: var(--amber); }
 
-  .solution{
-    display:none; margin-top: 14px;
+  .check-btn{
+    background: transparent; border: 1px solid var(--line);
+    color: var(--cyan); font-family: var(--mono); font-size: 12.5px;
+    padding: 9px 16px; cursor: pointer; border-radius: 4px;
+    display:flex; align-items:center; gap:8px;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
   }
+  .check-btn:hover{ border-color: var(--cyan); }
+  .check-btn.ok{
+    background: rgba(111,207,151,.14);
+    border-color: var(--green);
+    color: var(--green);
+    box-shadow: 0 0 14px rgba(111,207,151,.20);
+  }
+  .check-btn.fail{
+    background: rgba(255,92,92,.12);
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .feedback{
+    display:none; margin-top: 12px;
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.65;
+    padding: 12px 14px; border-radius: 4px;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .feedback.open{ display:block; }
+  .feedback.ok{ color: var(--green); border-color:#2b4a3a; background: rgba(111,207,151,.06); }
+  .feedback.fail{ color: var(--red); border-color:#4a2424; background: rgba(255,92,92,.05); }
+  .feedback.warn{ color: var(--amber); border-color:#4a3a1e; background: rgba(255,159,28,.06); }
+  .feedback ul{ margin: 8px 0 0 18px; }
+  .feedback li{ color: var(--muted); margin-bottom: 4px; }
+
+  /* ===== RESULT CONSOLE ===== */
+  .result-console{
+    display:none;
+    margin-top: 14px;
+    background: #0A0B0E;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .result-console.open{ display:block; }
+  .result-console.ok{ border-color:#2b4a3a; }
+  .result-console.err{ border-color:#4a2424; }
+
+  .result-head{
+    padding: 9px 12px;
+    background: #12141A;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    display:flex; justify-content:space-between; align-items:center;
+    gap: 10px; flex-wrap: wrap; letter-spacing:.4px;
+  }
+  .result-head .st-ok{ color: var(--green); font-weight:600; }
+  .result-head .st-err{ color: var(--red); font-weight:600; }
+  .result-head .rh-count{ color: var(--amber); }
+
+  .result-body{ max-height: 340px; overflow: auto; }
+  .result-body table{
+    width: 100%; border-collapse: collapse;
+    font-family: var(--mono); font-size: 12px;
+  }
+  .result-body th{
+    position: sticky; top: 0; z-index: 1;
+    background: #12141A; color: var(--cyan);
+    text-align: left; padding: 7px 12px;
+    font-weight: 600; font-size: 11px; letter-spacing: .5px;
+    border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  .result-body td{
+    padding: 6px 12px; color: #C9C7C0;
+    border-bottom: 1px solid #1A1D24;
+    white-space: nowrap;
+  }
+  .result-body tr:hover td{ background: #14161C; color: var(--text); }
+  .result-body td.num{ color: #D7E8E6; }
+  .result-empty{
+    padding: 16px 12px; font-family: var(--mono);
+    font-size: 12px; color: var(--muted); line-height:1.6;
+  }
+  .result-foot{
+    padding: 7px 12px; border-top: 1px solid var(--line);
+    background:#0E1015;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+
+  .solution{ display:none; margin-top: 14px; }
   .solution.open{ display:block; }
   .solution pre{
     background: #0C0D11; border: 1px solid var(--line);
@@ -357,6 +445,415 @@
 <footer>RUNDOWN · dados 100% simulados, uso livre para treino · sem conexão com banco real</footer>
 
 <script>
+/* =========================================================================
+   BASE DE DADOS SIMULADA (seed fixa -> resultados estáveis)
+   ========================================================================= */
+let __seed = 1337;
+function rnd(){ __seed = (__seed * 9301 + 49297) % 233280; return __seed / 233280; }
+function ri(min,max){ return Math.floor(rnd() * (max - min + 1)) + min; }
+function pick(a){ return a[Math.floor(rnd() * a.length)]; }
+
+const HOJE = new Date(); HOJE.setHours(0,0,0,0);
+function addDays(d,n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function fmtDate(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function sameDay(a,b){
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+const money = n => 'R$ ' + Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+
+/* --- clientes --- */
+const CLIENTES = [
+  {cliente_id:1, nome:'Supermercados Aurora', segmento:'Varejo',     tier:'Enterprise'},
+  {cliente_id:2, nome:'Banco Nexo',           segmento:'Financeiro', tier:'Enterprise'},
+  {cliente_id:3, nome:'Concessionária Vetor', segmento:'Auto',       tier:'Mid'},
+  {cliente_id:4, nome:'Alimentos Prisma',     segmento:'FMCG',       tier:'Enterprise'},
+  {cliente_id:5, nome:'EducaMais',            segmento:'Educação',   tier:'SMB'},
+  {cliente_id:6, nome:'Farmácia Vitalis',     segmento:'Varejo',     tier:'Mid'},
+  {cliente_id:7, nome:'Seguradora Lumen',     segmento:'Financeiro', tier:'Mid'},
+  {cliente_id:8, nome:'TechNova',             segmento:'Educação',   tier:'SMB'},
+];
+
+/* --- campanhas: [id, cliente, nome, canal, objetivo, offsetInicio, offsetFim] --- */
+const CAMPANHAS_DEF = [
+  [101,1,'Aurora Verão',          'Meta',         'Conversão', -50,  20],
+  [102,1,'Aurora Sempre',         'Google',       'Awareness', -40,  -5],
+  [103,2,'Nexo Conta Digital',    'Google',       'Conversão', -45,  25],
+  [104,2,'Nexo Institucional',    'YouTube',      'Awareness', -30,  10],
+  [105,3,'Vetor SUV',             'Meta',         'Tráfego',   -35,  -2],
+  [106,4,'Prisma Natal',          'Programática', 'Awareness', -25,  15],
+  [107,4,'Prisma Linha Fit',      'TikTok',       'Conversão', -20,  30],
+  [108,5,'EducaMais Vestibular',  'Google',       'Conversão', -60,   5],
+  [109,5,'EducaMais Marca',       'YouTube',      'Awareness', -15,  20],
+  [110,6,'Vitalis Gripe',         'Meta',         'Tráfego',   -22,   8],
+  [111,7,'Lumen Auto',            'Programática', 'Conversão', -18,  22],
+  [205,3,'Vetor Pickup',          'TikTok',       'Awareness', -40,  15],
+  [210,6,'Vitalis Beleza',        'Google',       'Conversão', -12,  18],
+  [215,7,'Lumen Residencial',     'Meta',         'Awareness', -10,  25],
+  [220,8,'TechNova Cursos',       'YouTube',      'Conversão',  -8,  30],
+];
+
+const CAMPANHAS = CAMPANHAS_DEF.map(c => ({
+  campanha_id: c[0],
+  cliente_id:  c[1],
+  nome:        c[2],
+  canal:       c[3],
+  objetivo:    c[4],
+  data_inicio: addDays(HOJE, c[5]),
+  data_fim:    addDays(HOJE, c[6]),
+  orcamento_total: ri(20, 400) * 1000,
+}));
+
+/* --- criativos --- */
+const FORMATOS = ['Vídeo','Carrossel','Estático','Stories'];
+const CRIATIVOS = [];
+let __crid = 201;
+CAMPANHAS.forEach(c => {
+  const n = ri(1,3);
+  for (let i = 0; i < n; i++) {
+    CRIATIVOS.push({
+      criativo_id: __crid++,
+      campanha_id: c.campanha_id,
+      nome: `${c.nome} — peça ${i+1}`,
+      formato: pick(FORMATOS),
+    });
+  }
+});
+
+/* --- veiculacoes --- */
+const VEICULACOES = [];
+let __vid = 1;
+const CAMP_COM_QUEDA_CTR   = [102,104,109,215]; // segunda metade perde CTR
+const CAMP_COM_ALTA_CTR    = [103,107,108,210]; // segunda metade ganha CTR
+const CAMP_205_GAPS = [[14,19],[5,7]];          // dias atrás sem veiculação
+
+CRIATIVOS.forEach(cr => {
+  const camp = CAMPANHAS.find(c => c.campanha_id === cr.campanha_id);
+  const limite = addDays(HOJE, -60);
+  const from = camp.data_inicio < limite ? limite : camp.data_inicio;
+  const meio = new Date((camp.data_inicio.getTime() + camp.data_fim.getTime()) / 2);
+
+  for (let d = from; d <= camp.data_fim && d <= HOJE; d = addDays(d, 1)) {
+    if (cr.campanha_id === 205) {
+      const diff = Math.round((HOJE - d) / 86400000);
+      if (CAMP_205_GAPS.some(([a,b]) => diff >= a && diff <= b)) continue;
+    }
+    if (rnd() < 0.28) continue;
+
+    const imp = ri(3000, 60000);
+    let ctr = 0.008 + rnd() * 0.020;
+
+    if (d > meio && CAMP_COM_QUEDA_CTR.includes(cr.campanha_id)) ctr *= 0.45;
+    if (d > meio && CAMP_COM_ALTA_CTR.includes(cr.campanha_id))  ctr *= 1.35;
+
+    const cli   = Math.max(0, Math.round(imp * ctr));
+    const gasto = +(((imp / 1000) * (6 + rnd() * 14))).toFixed(2);
+
+    VEICULACOES.push({
+      veiculacao_id: __vid++,
+      criativo_id: cr.criativo_id,
+      data: new Date(d),
+      impressoes: imp,
+      cliques: cli,
+      gasto,
+    });
+  }
+});
+
+/* --- conversoes --- */
+const CAMP_SEM_CONVERSAO = [220, 105]; // forçado: campanhas que nunca converteram
+const CONVERSOES = [];
+let __conv = 1;
+VEICULACOES.forEach(v => {
+  const camp = CRIATIVOS.find(c => c.criativo_id === v.criativo_id);
+  if (CAMP_SEM_CONVERSAO.includes(camp.campanha_id)) return;
+  if (rnd() < 0.33) return;
+  const n = ri(1,2);
+  for (let i = 0; i < n; i++) {
+    CONVERSOES.push({
+      conversao_id: __conv++,
+      veiculacao_id: v.veiculacao_id,
+      data: v.data,
+      tipo: pick(['Lead','Venda','Cadastro']),
+      valor: +(80 + rnd() * 900).toFixed(2),
+    });
+  }
+});
+
+/* --- atalhos --- */
+const getCriativo  = id => CRIATIVOS.find(c => c.criativo_id === id);
+const getCampanha  = id => CAMPANHAS.find(c => c.campanha_id === id);
+const getCliente   = id => CLIENTES.find(c => c.cliente_id === id);
+const campanhaDoCriativo = id => getCampanha(getCriativo(id).campanha_id);
+const veicPorId = new Map(VEICULACOES.map(v => [v.veiculacao_id, v]));
+
+/* =========================================================================
+   "EXECUÇÃO" DE CADA CASO (resultado esperado a partir da base simulada)
+   ========================================================================= */
+const RUNNERS = [
+  /* 01 */ () => {
+    const ontem = addDays(HOJE, -1);
+    const rows = VEICULACOES
+      .filter(v => sameDay(v.data, ontem) && v.impressoes > 0)
+      .sort((a,b) => b.gasto - a.gasto)
+      .map(v => [v.veiculacao_id, v.criativo_id, fmtDate(v.data), v.impressoes, v.cliques, money(v.gasto)]);
+    return { cols:['veiculacao_id','criativo_id','data','impressoes','cliques','gasto'], rows,
+             note:`data de referência: ${fmtDate(ontem)}` };
+  },
+
+  /* 02 */ () => {
+    const rows = CAMPANHAS
+      .filter(c => getCliente(c.cliente_id).tier === 'Enterprise' && c.data_fim >= HOJE)
+      .sort((a,b) => a.data_fim - b.data_fim)
+      .map(c => [c.campanha_id, c.nome, c.canal, fmtDate(c.data_fim)]);
+    return { cols:['campanha_id','nome','canal','data_fim'], rows,
+             note:`hoje: ${fmtDate(HOJE)}` };
+  },
+
+  /* 03 */ () => {
+    const m = new Map();
+    VEICULACOES.forEach(v => {
+      const cid = campanhaDoCriativo(v.criativo_id).campanha_id;
+      if (!m.has(cid)) m.set(cid, {g:0, cl:0});
+      const o = m.get(cid); o.g += v.gasto; o.cl += v.cliques;
+    });
+    const arr = [...m.entries()].map(([id,o]) => {
+      const camp = getCampanha(id);
+      return { id, nome: camp.nome, g:o.g, cl:o.cl, cpc: o.cl > 0 ? o.g / o.cl : null };
+    }).sort((a,b) => (b.cpc ?? -1) - (a.cpc ?? -1));
+    return { cols:['campanha_id','nome','gasto_total','cliques_total','cpc_medio'],
+             rows: arr.map(x => [x.id, x.nome, money(x.g), x.cl, x.cpc === null ? 'NULL' : money(x.cpc)]) };
+  },
+
+  /* 04 */ () => {
+    const rows = CLIENTES.map(cl => [
+      cl.cliente_id, cl.nome,
+      CAMPANHAS.filter(c => c.cliente_id === cl.cliente_id).length
+    ]).sort((a,b) => a[2] - b[2]);
+    return { cols:['cliente_id','nome','total_campanhas'], rows };
+  },
+
+  /* 05 */ () => {
+    const m = new Map();
+    CRIATIVOS.forEach(cr => {
+      if (getCampanha(cr.campanha_id).objetivo === 'Awareness') {
+        m.set(cr.formato, (m.get(cr.formato) || 0) + 1);
+      }
+    });
+    const rows = [...m.entries()].sort((a,b) => b[1] - a[1]).map(([f,n]) => [f,n]);
+    return { cols:['formato','qtd_criativos'], rows };
+  },
+
+  /* 06 */ () => {
+    const m = new Map();
+    VEICULACOES.forEach(v => {
+      if (v.data.getMonth() !== HOJE.getMonth() || v.data.getFullYear() !== HOJE.getFullYear()) return;
+      const canal = campanhaDoCriativo(v.criativo_id).canal;
+      if (!m.has(canal)) m.set(canal, {imp:0, cl:0});
+      const o = m.get(canal); o.imp += v.impressoes; o.cl += v.cliques;
+    });
+    const rows = [...m.entries()]
+      .map(([c,o]) => [c, o.imp > 0 ? o.cl / o.imp : 0])
+      .filter(r => r[1] > 0.015)
+      .sort((a,b) => b[1] - a[1])
+      .map(r => [r[0], (r[1]*100).toFixed(2) + '%']);
+    return { cols:['canal','ctr_medio'], rows,
+             note:'corte aplicado: CTR > 1.5%' };
+  },
+
+  /* 07 */ () => {
+    const gastos = CLIENTES.map(cl => {
+      let g = 0;
+      VEICULACOES.forEach(v => {
+        if (campanhaDoCriativo(v.criativo_id).cliente_id === cl.cliente_id) g += v.gasto;
+      });
+      return { cl, g };
+    }).filter(x => x.g > 0);
+    const media = gastos.reduce((s,x) => s + x.g, 0) / gastos.length;
+    const rows = gastos.filter(x => x.g > media).sort((a,b) => b.g - a.g)
+      .map(x => [x.cl.cliente_id, x.cl.nome, money(x.g)]);
+    return { cols:['cliente_id','nome','gasto_total'], rows,
+             note:`média geral por cliente: ${money(media)}` };
+  },
+
+  /* 08 */ () => {
+    const campanhasComConversao = new Set();
+    CONVERSOES.forEach(cv => {
+      const v = veicPorId.get(cv.veiculacao_id);
+      if (v) campanhasComConversao.add(campanhaDoCriativo(v.criativo_id).campanha_id);
+    });
+    const m = new Map();
+    VEICULACOES.forEach(v => {
+      if (v.gasto <= 0) return;
+      const camp = campanhaDoCriativo(v.criativo_id);
+      if (campanhasComConversao.has(camp.campanha_id)) return;
+      m.set(camp.campanha_id, camp.nome);
+    });
+    const rows = [...m.entries()].map(([id,nome]) => [id,nome]);
+    return { cols:['campanha_id','nome'], rows };
+  },
+
+  /* 09 */ () => {
+    const gastoCriativo = new Map();
+    VEICULACOES.forEach(v => {
+      gastoCriativo.set(v.criativo_id, (gastoCriativo.get(v.criativo_id) || 0) + v.gasto);
+    });
+    const porCampanha = new Map();
+    gastoCriativo.forEach((g, crid) => {
+      const cr = getCriativo(crid);
+      if (!porCampanha.has(cr.campanha_id)) porCampanha.set(cr.campanha_id, []);
+      porCampanha.get(cr.campanha_id).push({ crid, nome: cr.nome, g });
+    });
+    const rows = [];
+    [...porCampanha.entries()].sort((a,b) => a[0] - b[0]).forEach(([campId, arr]) => {
+      arr.sort((a,b) => b.g - a.g);
+      arr.slice(0,3).forEach((x,i) => rows.push([campId, x.crid, x.nome, money(x.g), i+1]));
+    });
+    return { cols:['campanha_id','criativo_id','nome','gasto_total','posicao'], rows };
+  },
+
+  /* 10 */ () => {
+    const m = new Map();
+    VEICULACOES.forEach(v => {
+      if (campanhaDoCriativo(v.criativo_id).campanha_id !== 101) return;
+      const k = fmtDate(v.data);
+      m.set(k, (m.get(k) || 0) + v.gasto);
+    });
+    const dias = [...m.entries()].sort((a,b) => a[0] < b[0] ? -1 : 1);
+    const rows = dias.map(([d,g],i) => [d, money(g), i === 0 ? 'NULL' : money(dias[i-1][1])]);
+    return { cols:['data','gasto_dia','gasto_dia_anterior'], rows,
+             note:'campanha 101' };
+  },
+
+  /* 11 */ () => {
+    const camp = getCampanha(205);
+    const crids = new Set(CRIATIVOS.filter(c => c.campanha_id === 205).map(c => c.criativo_id));
+    const porDia = new Map();
+    VEICULACOES.forEach(v => {
+      if (!crids.has(v.criativo_id)) return;
+      const k = fmtDate(v.data);
+      porDia.set(k, (porDia.get(k) || 0) + v.gasto);
+    });
+    const blocos = [];
+    let cur = null;
+    for (let d = new Date(camp.data_inicio); d <= camp.data_fim && d <= HOJE; d = addDays(d,1)) {
+      const k = fmtDate(d);
+      const g = porDia.get(k) || 0;
+      if (g === 0) {
+        if (!cur) cur = { ini:k, fim:k, n:1 };
+        else { cur.fim = k; cur.n++; }
+      } else if (cur) { blocos.push(cur); cur = null; }
+    }
+    if (cur) blocos.push(cur);
+    return { cols:['inicio_bloco','fim_bloco','dias_zerados'],
+             rows: blocos.map(b => [b.ini, b.fim, b.n]),
+             note:'campanha 205 · janela ativa' };
+  },
+
+  /* 12 */ () => {
+    const m = new Map();
+    VEICULACOES.forEach(v => {
+      if (v.data.getMonth() !== HOJE.getMonth() || v.data.getFullYear() !== HOJE.getFullYear()) return;
+      const cid = campanhaDoCriativo(v.criativo_id).cliente_id;
+      if (!m.has(cid)) m.set(cid, {g:0, r:0});
+      m.get(cid).g += v.gasto;
+    });
+    CONVERSOES.forEach(cv => {
+      const v = veicPorId.get(cv.veiculacao_id);
+      if (!v) return;
+      if (v.data.getMonth() !== HOJE.getMonth() || v.data.getFullYear() !== HOJE.getFullYear()) return;
+      const cid = campanhaDoCriativo(v.criativo_id).cliente_id;
+      if (!m.has(cid)) m.set(cid, {g:0, r:0});
+      m.get(cid).r += cv.valor;
+    });
+    const rows = [...m.entries()]
+      .filter(([,o]) => o.g > 5000)
+      .map(([cid,o]) => {
+        const cl = getCliente(cid);
+        return { cid, nome: cl.nome, g:o.g, r:o.r, roas:o.r / o.g };
+      })
+      .sort((a,b) => b.roas - a.roas)
+      .map(x => [x.cid, x.nome, money(x.g), money(x.r), x.roas.toFixed(2)]);
+    return { cols:['cliente_id','nome','gasto_total','receita_total','roas'], rows,
+             note:'mês atual · corte: gasto > R$ 5.000' };
+  },
+
+  /* 13 */ () => {
+    const rows = [];
+    CAMPANHAS.forEach(camp => {
+      const meio = new Date((camp.data_inicio.getTime() + camp.data_fim.getTime()) / 2);
+      let i1 = 0, c1 = 0, i2 = 0, c2 = 0;
+      VEICULACOES.forEach(v => {
+        if (campanhaDoCriativo(v.criativo_id).campanha_id !== camp.campanha_id) return;
+        if (v.data <= meio) { i1 += v.impressoes; c1 += v.cliques; }
+        else                { i2 += v.impressoes; c2 += v.cliques; }
+      });
+      if (i1 === 0 || i2 === 0) return;
+      const ctr1 = c1 / i1, ctr2 = c2 / i2;
+      const variacao = (ctr2 - ctr1) / ctr1;
+      if (variacao < -0.30) {
+        rows.push([camp.campanha_id, (ctr1*100).toFixed(2)+'%', (ctr2*100).toFixed(2)+'%', (variacao*100).toFixed(1)+'%']);
+      }
+    });
+    return { cols:['campanha_id','ctr_1a_metade','ctr_2a_metade','variacao'], rows,
+             note:'critério: queda > 30%' };
+  },
+
+  /* 14 */ () => {
+    const comConv = new Set(CONVERSOES.map(c => c.veiculacao_id));
+    const m = new Map();
+    VEICULACOES.forEach(v => {
+      const canal = campanhaDoCriativo(v.criativo_id).canal;
+      if (!m.has(canal)) m.set(canal, {tot:0, cli:0, conv:0});
+      const o = m.get(canal);
+      o.tot++;
+      if (v.cliques > 0) o.cli++;
+      if (comConv.has(v.veiculacao_id)) o.conv++;
+    });
+    const rows = [...m.entries()].map(([c,o]) => [
+      c, o.tot, o.cli, o.conv,
+      (o.cli / o.tot * 100).toFixed(1) + '%',
+      o.cli > 0 ? (o.conv / o.cli * 100).toFixed(1) + '%' : 'NULL'
+    ]).sort((a,b) => parseFloat(b[5]) - parseFloat(a[5]));
+    return { cols:['canal','total_veiculacoes','com_clique','com_conversao','taxa_clique','taxa_conv_sobre_clique'], rows };
+  },
+
+  /* 15 */ () => {
+    const mesAnt = addDays(new Date(HOJE.getFullYear(), HOJE.getMonth(), 1), -1);
+    const mAtual = new Map(), mAnt = new Map();
+    VEICULACOES.forEach(v => {
+      const cid = campanhaDoCriativo(v.criativo_id).cliente_id;
+      const isAtual = v.data.getMonth() === HOJE.getMonth() && v.data.getFullYear() === HOJE.getFullYear();
+      const isAnt   = v.data.getMonth() === mesAnt.getMonth() && v.data.getFullYear() === mesAnt.getFullYear();
+      if (isAtual) mAtual.set(cid, (mAtual.get(cid) || 0) + v.gasto);
+      if (isAnt)   mAnt.set(cid, (mAnt.get(cid) || 0) + v.gasto);
+    });
+    const emQueda = CLIENTES.filter(cl => (mAtual.get(cl.cliente_id) || 0) < (mAnt.get(cl.cliente_id) || 0));
+    const out = [];
+    emQueda.forEach(cl => {
+      const m = new Map();
+      VEICULACOES.forEach(v => {
+        if (v.data.getMonth() !== HOJE.getMonth() || v.data.getFullYear() !== HOJE.getFullYear()) return;
+        if (campanhaDoCriativo(v.criativo_id).cliente_id !== cl.cliente_id) return;
+        m.set(v.criativo_id, (m.get(v.criativo_id) || 0) + v.gasto);
+      });
+      const arr = [...m.entries()].sort((a,b) => b[1] - a[1]);
+      if (arr.length) out.push({ cid: cl.cliente_id, crid: arr[0][0], g: arr[0][1] });
+    });
+    out.sort((a,b) => b.g - a.g);
+    return { cols:['cliente_id','criativo_id','nome','gasto_criativo'],
+             rows: out.map(x => [x.cid, x.crid, getCriativo(x.crid).nome, money(x.g)]),
+             note:'clientes com queda mês contra mês' };
+  },
+];
+
+/* =========================================================================
+   CASOS
+   ========================================================================= */
 const cases = [
   {
     time:"09h02", tag:"SEGMENTO 01", diff:1,
@@ -706,6 +1203,157 @@ criativo_top <span class="kw">AS</span> (
 
 const diffLabel = ["", "BÁSICO", "INTERMEDIÁRIO", "AVANÇADO", "SÊNIOR"];
 
+/* =========================================================================
+   REGRAS DE CONFERÊNCIA
+   ========================================================================= */
+const CHECKERS = [
+  /* 01 */ [
+    { alts:[/\bSELECT\b/], hint:'Comece selecionando as colunas com SELECT.' },
+    { alts:[/\bFROM\s+VEICULACOES\b/], hint:'A tabela base é veiculacoes.' },
+    { alts:[/\bWHERE\b/], hint:'Aplique um filtro com WHERE.' },
+    { alts:[/GETDATE\s*\(\s*\)\s*-\s*1/, /DATEADD\s*\(\s*(DAY|DD|D)\s*,\s*-\s*1/], hint:'Filtre a data de ontem (GETDATE()-1 ou DATEADD(DAY,-1,GETDATE())).' },
+    { alts:[/IMPRESSOES\s*>\s*0/, /IMPRESSOES\s*>=\s*1/, /IMPRESSOES\s*<>\s*0/], hint:'Filtre impressões maiores que zero.' },
+    { alts:[/\bORDER\s+BY\b.*\bGASTO\b.*\bDESC\b/], hint:'Ordene do maior gasto para o menor (ORDER BY gasto DESC).' },
+  ],
+  /* 02 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT para listar as campanhas.' },
+    { alts:[/\bFROM\s+CAMPANHAS\b/, /\bJOIN\s+CAMPANHAS\b/], hint:'A tabela principal é campanhas.' },
+    { alts:[/\bJOIN\s+CLIENTES\b/, /\bFROM\s+CLIENTES\b/], hint:'Faça o JOIN com clientes para chegar no tier.' },
+    { alts:[/TIER\s*=\s*['"]ENTERPRISE['"]/], hint:"Filtre tier = 'Enterprise'." },
+    { alts:[/DATA_FIM\s*>=\s*(CAST\s*\(\s*)?(GETDATE|CONVERT)/, /DATA_FIM\s*>\s*(CAST\s*\(\s*)?GETDATE/], hint:'Compare data_fim com a data de hoje (data_fim >= hoje).' },
+  ],
+  /* 03 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/SUM\s*\([^)]*GASTO/], hint:'Some o gasto com SUM().' },
+    { alts:[/SUM\s*\([^)]*CLIQUES/], hint:'Some os cliques com SUM().' },
+    { alts:[/\//], hint:'Divida gasto por cliques para chegar no CPC.' },
+    { alts:[/\bGROUP\s+BY\b/], hint:'Agrupe por campanha com GROUP BY.' },
+    { alts:[/\bJOIN\s+CRIATIVOS\b/], hint:'Junte com criativos.' },
+    { alts:[/\bJOIN\s+VEICULACOES\b/], hint:'Junte com veiculacoes.' },
+  ],
+  /* 04 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bFROM\s+CLIENTES\b/, /\bJOIN\s+CLIENTES\b/], hint:'Parta da tabela clientes.' },
+    { alts:[/\bLEFT\s+(OUTER\s+)?JOIN\b/], hint:'Use LEFT JOIN para não perder clientes sem campanha.' },
+    { alts:[/COUNT\s*\(/], hint:'Conte as campanhas com COUNT().' },
+    { alts:[/\bGROUP\s+BY\b/], hint:'Agrupe por cliente com GROUP BY.' },
+  ],
+  /* 05 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bJOIN\s+CRIATIVOS\b/, /\bFROM\s+CRIATIVOS\b/], hint:'Parta de criativos.' },
+    { alts:[/\bJOIN\s+CAMPANHAS\b/, /\bFROM\s+CAMPANHAS\b/], hint:'Junte com campanhas.' },
+    { alts:[/['"]AWARENESS['"]/], hint:"Filtre objetivo = 'Awareness'." },
+    { alts:[/\bGROUP\s+BY\b.*\bFORMATO\b/], hint:'Agrupe por formato (GROUP BY formato).' },
+  ],
+  /* 06 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bJOIN\s+VEICULACOES\b/], hint:'Junte com veiculacoes para chegar em cliques/impressões.' },
+    { alts:[/MONTH\s*\(\s*[A-Z]*\.?DATA\s*\)/, /GETDATE\s*\(\s*\)/], hint:'Filtre o mês atual (MONTH(data) = MONTH(GETDATE())).' },
+    { alts:[/\bGROUP\s+BY\b.*\bCANAL\b/], hint:'Agrupe por canal.' },
+    { alts:[/\bHAVING\b/], hint:'O filtro de CTR é sobre a agregação — use HAVING, não WHERE.' },
+    { alts:[/0\.015/, /\b1\.5\b/], hint:'O corte é CTR > 1.5% (0.015).' },
+  ],
+  /* 07 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bJOIN\s+VEICULACOES\b/], hint:'Junte com veiculacoes.' },
+    { alts:[/SUM\s*\([^)]*GASTO/], hint:'Some o gasto por cliente (SUM).' },
+    { alts:[/\bAVG\s*\(/], hint:'Você precisa da média geral de gasto por cliente (AVG).' },
+    { alts:[/\bGROUP\s+BY\b/], hint:'Agrupe por cliente.' },
+    { alts:[/>\s*\(\s*SELECT/, /CROSS\s+JOIN/, /,\s*\(\s*SELECT\s+AVG/], hint:'Compare o gasto de cada cliente com a média via subquery.' },
+  ],
+  /* 08 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bJOIN\s+VEICULACOES\b/], hint:'Junte com veiculacoes.' },
+    { alts:[/GASTO\s*>\s*0/], hint:'Considere só veiculações com gasto > 0.' },
+    { alts:[/\bNOT\s+EXISTS\b/, /\bNOT\s+IN\s*\(\s*SELECT/, /\bLEFT\s+JOIN\s+CONVERSOES\b.*IS\s+NULL/], hint:'Exclua quem tem conversão: NOT EXISTS, NOT IN ou LEFT JOIN ... IS NULL.' },
+    { alts:[/CONVERSOES/], hint:'A tabela conversoes precisa aparecer na query.' },
+  ],
+  /* 09 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bJOIN\s+CRIATIVOS\b/], hint:'Junte com criativos.' },
+    { alts:[/\bJOIN\s+VEICULACOES\b/], hint:'Junte com veiculacoes.' },
+    { alts:[/ROW_NUMBER\s*\(\s*\)\s*OVER/, /\bRANK\s*\(\s*\)\s*OVER/, /\bDENSE_RANK\s*\(\s*\)\s*OVER/], hint:'Use uma window function (ROW_NUMBER/RANK) para ranquear.' },
+    { alts:[/\bPARTITION\s+BY\b/], hint:'Partitione o ranking por campanha (PARTITION BY campanha_id).' },
+    { alts:[/<=\s*3/, /<\s*4/, /=\s*3\b/, /TOP\s*3/], hint:'Filtre as 3 primeiras posições.' },
+  ],
+  /* 10 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bLAG\s*\(/, /VEICULACOES.*VEICULACOES/], hint:'Use LAG() para trazer o dia anterior na mesma linha.' },
+    { alts:[/\bOVER\s*\(/], hint:'A função de janela precisa de OVER().' },
+    { alts:[/\b101\b/], hint:'Filtre a campanha 101.' },
+    { alts:[/ORDER\s+BY\s+[A-Z]*\.?DATA/, /\bOVER\s*\(.*ORDER\s+BY\b/], hint:'Ordene a janela por data.' },
+  ],
+  /* 11 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bWITH\b/], hint:'Monte o calendário/base com CTE (WITH).' },
+    { test:s => (s.match(/ROW_NUMBER/g)||[]).length >= 2, hint:'O truque de gaps & islands precisa de DOIS ROW_NUMBER() (um geral, um particionado pela flag).' },
+    { alts:[/\bMIN\s*\(/], hint:'Use MIN(data) para achar o início do bloco.' },
+    { alts:[/\bMAX\s*\(/], hint:'Use MAX(data) para achar o fim do bloco.' },
+    { alts:[/\bGROUP\s+BY\b/], hint:'Agrupe por bloco (GROUP BY grupo).' },
+    { alts:[/\b205\b/], hint:'Filtre a campanha 205.' },
+  ],
+  /* 12 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bWITH\b/], hint:'Organize com uma CTE (WITH).' },
+    { alts:[/SUM\s*\([^)]*GASTO/], hint:'Some o gasto por cliente.' },
+    { alts:[/SUM\s*\([^)]*VALOR/, /COALESCE\s*\(\s*SUM/], hint:'Some o valor das conversões (com COALESCE se quiser tratar NULL).' },
+    { alts:[/\bLEFT\s+JOIN\s+CONVERSOES\b/], hint:'Use LEFT JOIN com conversoes para não perder quem não converteu.' },
+    { alts:[/\b5000\b/], hint:'Filtre clientes com gasto acima de R$ 5.000.' },
+    { alts:[/\//], hint:'Calcule o ROAS dividindo receita por gasto.' },
+  ],
+  /* 13 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { test:s => (s.match(/CASE\s+WHEN/g)||[]).length >= 2, hint:'Use dois CASE WHEN dentro da agregação (uma janela de tempo por período).' },
+    { alts:[/\bJOIN\s+VEICULACOES\b/], hint:'Junte com veiculacoes.' },
+    { alts:[/\bGROUP\s+BY\b/], hint:'Agrupe por campanha.' },
+    { alts:[/0\.3/, /\b30\b/], hint:'A queda é de 30% (-0.30).' },
+    { alts:[/\//], hint:'Calcule a variação percentual dividindo pela base da primeira metade.' },
+  ],
+  /* 14 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/CONVERSOES/], hint:'Você precisa chegar na tabela conversoes.' },
+    { alts:[/\bEXISTS\s*\(/, /\bLEFT\s+JOIN\s+CONVERSOES\b/], hint:'Marque quem teve conversão com EXISTS (ou LEFT JOIN).' },
+    { alts:[/COUNT\s*\(/], hint:'Conte veiculações com COUNT(*).' },
+    { alts:[/\bCANAL\b/], hint:'O funil é por canal.' },
+    { alts:[/\bGROUP\s+BY\b.*\bCANAL\b/], hint:'Agrupe por canal.' },
+    { alts:[/\//], hint:'Calcule as taxas de cada etapa (divisão).' },
+  ],
+  /* 15 */ [
+    { alts:[/\bSELECT\b/], hint:'Use SELECT.' },
+    { alts:[/\bWITH\b/], hint:'Encadeie CTEs com WITH para organizar o problema.' },
+    { alts:[/ROW_NUMBER\s*\(\s*\)\s*OVER/], hint:'Use ROW_NUMBER() para pegar o top 1 de cada cliente.' },
+    { alts:[/\bPARTITION\s+BY\b/], hint:'Partitione por cliente (PARTITION BY cliente_id).' },
+    { alts:[/\b(RN|POS|POSICAO|RANK|ROWNUM)\s*=\s*1\b/, /<=\s*1\b/], hint:'Filtre a posição 1.' },
+    { alts:[/DATEADD\s*\(\s*MONTH\s*,\s*-\s*1/, /MONTH\s*\(\s*GETDATE[^)]*\)\s*-\s*1/, /EOMONTH/], hint:'Compare o mês atual com o mês anterior.' },
+  ],
+];
+
+function normalizeSQL(sql){
+  return sql
+    .replace(/--[^\n]*/g, ' ')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .toUpperCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function evaluate(idx, norm){
+  const reqs = CHECKERS[idx] || [];
+  const missing = [];
+  reqs.forEach(r => {
+    let pass = false;
+    if (typeof r.test === 'function') pass = !!r.test(norm);
+    else pass = r.alts.some(rx => rx.test(norm));
+    if (!pass) missing.push(r.hint);
+  });
+  return { ok: missing.length === 0, missing };
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+const MAX_ROWS = 100;
+
 function render(){
   const container = document.getElementById('rundown');
   container.innerHTML = cases.map((c, i) => `
@@ -733,7 +1381,20 @@ function render(){
             </div>
             <textarea class="console" id="console-${i}" data-idx="${i}" spellcheck="false" placeholder="SELECT ..."></textarea>
           </div>
-          <button class="reveal-btn" data-idx="${i}">▶ Ver resolução</button>
+          <div class="case-actions">
+            <button class="check-btn" data-idx="${i}">✓ Conferir query</button>
+            <button class="reveal-btn" data-idx="${i}">▶ Ver resolução</button>
+          </div>
+          <div class="feedback" id="fb-${i}"></div>
+
+          <div class="result-console" id="rc-${i}">
+            <div class="result-head">
+              <span id="rct-${i}">aguardando execução</span>
+              <span class="rh-count" id="rcc-${i}"></span>
+            </div>
+            <div class="result-body" id="rcb-${i}"></div>
+          </div>
+
           <div class="solution" id="sol-${i}">
             <pre>${c.sql}</pre>
             <div class="why"><b>Por que importa:</b> ${c.why}</div>
@@ -757,17 +1418,141 @@ function render(){
     btn.addEventListener('click', ()=>{
       const idx = btn.dataset.idx;
       document.getElementById('console-'+idx).value = '';
+      resetCheckState(idx);
     });
+  });
+
+  document.querySelectorAll('.check-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx  = btn.dataset.idx;
+      const ta   = document.getElementById('console-'+idx);
+      const fb   = document.getElementById('fb-'+idx);
+      const card = document.getElementById('case-'+idx).querySelector('.case-card');
+      const raw  = ta.value.trim();
+
+      resetCheckState(idx);
+
+      if(!raw){
+        fb.className = 'feedback open warn';
+        fb.innerHTML = '⚠ Escreva sua query antes de conferir.';
+        return;
+      }
+
+      const norm = normalizeSQL(raw);
+      const res  = evaluate(Number(idx), norm);
+
+      if(res.ok){
+        btn.classList.add('ok');
+        btn.textContent = '✓ Query correta';
+        card.classList.add('correct');
+        fb.className = 'feedback open ok';
+        fb.innerHTML = '✓ Boa. A query cobre os pontos essenciais do pedido. Compare com a resolução oficial abaixo pra ver se você escreveu de um jeito diferente (ou melhor).';
+        executeAndShow(Number(idx));
+      }else{
+        btn.classList.add('fail');
+        btn.textContent = '✕ Revisar query';
+        card.classList.add('wrong');
+        fb.className = 'feedback open fail';
+        fb.innerHTML = '✕ Ainda falta coisa:<ul>' +
+                       res.missing.map(m=>`<li>${m}</li>`).join('') +
+                       '</ul>';
+        showExecBlocked(Number(idx));
+      }
+    });
+  });
+
+  document.querySelectorAll('.console').forEach(ta=>{
+    ta.addEventListener('input', ()=> resetCheckState(ta.dataset.idx));
   });
 
   document.querySelectorAll('.mark-done').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const idx = btn.dataset.idx;
-      const caseEl = document.getElementById('case-'+idx);
-      caseEl.classList.toggle('done');
+      document.getElementById('case-'+idx).classList.toggle('done');
       updateProgress();
     });
   });
+}
+
+/* ===== execução simulada + console de resultado ===== */
+function executeAndShow(idx){
+  const rc  = document.getElementById('rc-'+idx);
+  const rct = document.getElementById('rct-'+idx);
+  const rcc = document.getElementById('rcc-'+idx);
+  const rcb = document.getElementById('rcb-'+idx);
+
+  rc.classList.add('open');
+  rc.classList.remove('err');
+  rc.classList.add('ok');
+
+  let data;
+  try{
+    data = RUNNERS[idx]();
+  }catch(err){
+    rct.innerHTML = '<span class="st-err">● erro na simulação</span>';
+    rcc.textContent = '';
+    rcb.innerHTML = '<div class="result-empty" style="color:var(--red)">Não foi possível simular o resultado: ' + err.message + '</div>';
+    return;
+  }
+
+  const total = data.rows.length;
+  rct.innerHTML = '<span class="st-ok">● execução simulada — ok</span>' +
+                  (data.note ? ' · <span style="color:var(--muted)">' + data.note + '</span>' : '');
+  rcc.textContent = total + ' linha' + (total === 1 ? '' : 's');
+
+  if(!total){
+    rcb.innerHTML = '<div class="result-empty">A query executou sem erro, mas retornou <b>0 linhas</b>.<br>Isso pode ser o resultado correto — ou um sinal de que o filtro está apertado demais.</div>';
+    return;
+  }
+
+  const slice = data.rows.slice(0, MAX_ROWS);
+  let html = '<table><thead><tr>' +
+    data.cols.map(c => `<th>${c}</th>`).join('') +
+    '</tr></thead><tbody>' +
+    slice.map(r => '<tr>' + r.map(v => `<td>${v === null || v === undefined ? 'NULL' : v}</td>`).join('') + '</tr>').join('') +
+    '</tbody></table>';
+
+  if(total > MAX_ROWS){
+    html += `<div class="result-foot">exibindo ${MAX_ROWS} de ${total} linhas · resultado truncado para visualização</div>`;
+  }
+  rcb.innerHTML = html;
+}
+
+function showExecBlocked(idx){
+  const rc  = document.getElementById('rc-'+idx);
+  const rct = document.getElementById('rct-'+idx);
+  const rcc = document.getElementById('rcc-'+idx);
+  const rcb = document.getElementById('rcb-'+idx);
+
+  rc.classList.add('open');
+  rc.classList.remove('ok');
+  rc.classList.add('err');
+
+  rct.innerHTML = '<span class="st-err">● execução bloqueada — a query não atende ao pedido</span>';
+  rcc.textContent = '';
+  rcb.innerHTML = '<div class="result-empty" style="color:var(--red)">Corrija os pontos listados acima e clique em <b>Conferir query</b> de novo para ver o resultado.</div>';
+}
+
+function resetCheckState(idx){
+  const btn  = document.querySelector('.check-btn[data-idx="'+idx+'"]');
+  const fb   = document.getElementById('fb-'+idx);
+  const card = document.getElementById('case-'+idx).querySelector('.case-card');
+  const rc   = document.getElementById('rc-'+idx);
+  const rcb  = document.getElementById('rcb-'+idx);
+  const rct  = document.getElementById('rct-'+idx);
+  const rcc  = document.getElementById('rcc-'+idx);
+  if(!btn || !fb || !card) return;
+  btn.classList.remove('ok','fail');
+  btn.textContent = '✓ Conferir query';
+  card.classList.remove('correct','wrong');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+  if(rc){
+    rc.className = 'result-console';
+    rct.textContent = 'aguardando execução';
+    rcc.textContent = '';
+    rcb.innerHTML = '';
+  }
 }
 
 function updateProgress(){
